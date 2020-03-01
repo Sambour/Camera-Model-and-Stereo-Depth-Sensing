@@ -18,12 +18,16 @@ imgpoints_r = []  # 2d points in image plane for right camera
 img_l = cv2.imread('../../images/task_2/left_0.png')
 img_r = cv2.imread('../../images/task_2/right_0.png')
 
+h, w = img_l.shape[:2]
 
 fs_l = cv2.FileStorage("../../parameters/left_camera_intrinsics.xml", cv2.FILE_STORAGE_READ)
-leftNode = fs_l.getNode("left_camera_intrinsic")
+cameraMatrix_l = fs_l.getNode("camera_intrinsic")
+#print(cameraMatrix_l.mat())
+distMatrix_l = fs_l.getNode("distort_coefficients")
 
 fs_r = cv2.FileStorage("../../parameters/right_camera_intrinsics.xml", cv2.FILE_STORAGE_READ)
-rightNode = fs_r("right_camera_intrinsic")
+cameraMatrix_r = fs_r.getNode("camera_intrinsic")
+distMatrix_r = fs_r.getNode("distort_coefficients")
 
 
 gray_l = cv2.cvtColor(img_l, cv2.COLOR_BGR2GRAY)
@@ -37,9 +41,13 @@ ret_r, corners_r = cv2.findChessboardCorners(gray_r, (9, 6), None)
 objpoints.append(objp)
 
 # Adding 2D point
-twoDPoint_l = cv2.cornerSubPix(gray_l, corner_l, (11, 11), (-1, -1), criteria)
+twoDPoint_l = cv2.cornerSubPix(gray_l, corners_l, (11, 11), (-1, -1), criteria)
 imgpoints_l.append(twoDPoint_l)
-twoDPoint_r = cv2.cornerSubPix(gray_r, corner_r, (11, 11), (-1, -1), criteria)
+twoDPoint_r = cv2.cornerSubPix(gray_r, corners_r, (11, 11), (-1, -1), criteria)
 imgpoints_r.append(twoDPoint_r)
 
-R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_l, imgpoints_r, 
+R = []
+R.append(cv2.stereoCalibrate(objpoints, imgpoints_l, imgpoints_r, cameraMatrix_l.mat(), distMatrix_l.mat(), cameraMatrix_r.mat(), distMatrix_r.mat(), (w, h), criteria = criteria, flags=cv2.CALIB_FIX_INTRINSIC))
+
+print(R)
+
