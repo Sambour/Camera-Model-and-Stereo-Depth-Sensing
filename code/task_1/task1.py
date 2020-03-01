@@ -67,7 +67,7 @@ for lr in [0, 1]:
     # print (np.dtype(dist))
 
     fs = cv2.FileStorage("../../parameters/" + lr_letter + "_camera_intrinsics.xml", cv2.FILE_STORAGE_WRITE)
-    fs.write('left_camera_intrinsic', mtx)
+    fs.write('camera_intrinsic', mtx)
     fs.write('distort_coefficients', dist)
 
     for fname in images[0]:
