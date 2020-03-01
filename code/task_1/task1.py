@@ -29,7 +29,7 @@ for lr in [0, 1]:
         lr_letter = r'left'
     else:
         lr_letter = r'right'
-    for fname in images[0]:
+    for fname in images[lr]:
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -68,7 +68,7 @@ for lr in [0, 1]:
     # print (np.dtype(dist))
 
     fs = cv2.FileStorage("../../parameters/" + lr_letter + "_camera_intrinsics.xml", cv2.FILE_STORAGE_WRITE)
-    fs.write('left_camera_intrinsic', mtx)
+    fs.write('camera_intrinsic', mtx)
     fs.write('distort_coefficients', dist)
 
     for fname in images[0]:
