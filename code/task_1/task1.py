@@ -29,10 +29,9 @@ for lr in [0, 1]:
         lr_letter = r'left'
     else:
         lr_letter = r'right'
-    for fname in images[0]:
+    for fname in images[lr]:
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
         # Find the chess board corners
         ret, corners = cv2.findChessboardCorners(gray, (9, 6), None)
 
