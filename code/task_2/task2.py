@@ -46,8 +46,7 @@ imgpoints_l.append(twoDPoint_l)
 twoDPoint_r = cv2.cornerSubPix(gray_r, corners_r, (11, 11), (-1, -1), criteria)
 imgpoints_r.append(twoDPoint_r)
 
-R = []
-R.append(cv2.stereoCalibrate(objpoints, imgpoints_l, imgpoints_r, cameraMatrix_l.mat(), distMatrix_l.mat(), cameraMatrix_r.mat(), distMatrix_r.mat(), (w, h), criteria = criteria, flags=cv2.CALIB_FIX_INTRINSIC))
 
-print(R)
+retval, cm1, dc1, cm2, dc2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_l, imgpoints_r, cameraMatrix_l.mat(), distMatrix_l.mat(), cameraMatrix_r.mat(), distMatrix_r.mat(), (w, h), criteria = criteria, flags=cv2.CALIB_FIX_INTRINSIC)
+
 
