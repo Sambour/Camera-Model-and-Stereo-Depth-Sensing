@@ -27,6 +27,6 @@ newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix_l.mat(), distMatr
 print(roi)
 mapx, mapy = cv2.initUndistortRectifyMap(cameraMatrix_l.mat(), distMatrix_l.mat(), None, newcameramtx, (w, h), 5)
 dst = cv2.remap(img_l, mapx, mapy, cv2.INTER_LINEAR)
-#x, y, w, h = roi
-#dst = dst[y:y + h, x:x + w]
+x, y, w, h = roi
+dst = dst[y:y + h, x:x + w]
 cv2.imwrite(r'../../output/task_3/l_distort.png', dst)

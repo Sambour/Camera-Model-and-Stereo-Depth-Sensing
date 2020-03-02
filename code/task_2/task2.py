@@ -2,6 +2,8 @@
 
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -67,21 +69,28 @@ projMatrix_r = np.c_[R, T]
 # calculate 4D points
 points4D = cv2.triangulatePoints(projMatrix_l, projMatrix_r, undist_l, undist_r)
 # print(points4D)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+Axes3D.plot(ax, points4D[0], points4D[1], points4D[2])
+plt.show()
 
 # Rectify the stereo camera.
 R1, R2, P1, P2, Q, validPixROI1, validPixROI2 = cv2.stereoRectify(cm1, dc1, cm2, dc2, (w, h), R, T)
 
 # Check the rectification results
-
 mapx_l, mapy_l = cv2.initUndistortRectifyMap(cm1, dc1, R1, P1, (w, h), 5)
 dst_l = cv2.remap(img_l, mapx_l, mapy_l, cv2.INTER_LINEAR)
+x, y, w, h = validPixROI1
+dst_l = dst_l[y:y + h, x:x + w]
 cv2.imwrite("img_l.png", dst_l)
-
 
 mapx_r, mapy_r = cv2.initUndistortRectifyMap(cm2, dc2, R2, P2, (w, h), 5)
 dst_r = cv2.remap(img_r, mapx_r, mapy_r, cv2.INTER_LINEAR)
+x, y, w, h = validPixROI2
+dst_r = dst_r[y:y + h, x:x + w]
 cv2.imwrite("img_r.png", dst_r)
 
+# write the parameters
 fs_sc = cv2.FileStorage("../../parameters/stereo_calibration.xml", cv2.FILE_STORAGE_WRITE)
 fs_sc.write('translation_vector', T)
 fs_sc.write('rotation_matrix', R)
