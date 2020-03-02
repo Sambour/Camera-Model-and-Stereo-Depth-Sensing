@@ -47,19 +47,41 @@ orb = cv2.ORB_create()
 kp_l = orb.detect(gray_l, None)
 kp_l, des_l = orb.compute(gray_l, kp_l)
 img2_l = cv2.drawKeypoints(gray_l, kp_l, None, color=(0,255,0), flags=0)
-#plt.imshow(img2_l), plt.show()
+plt.imshow(img2_l), plt.show()
 
 keypoint_list = []
-keypoint_sorted = []
 for i, keypoint in enumerate(kp_l):
     #print("Keypoint:", i, keypoint)
     keypoint_list.append(keypoint)
 
+# sort by response
 cmpfun = operator.attrgetter('response')
 keypoint_list.sort(key=cmpfun, reverse=True)
 
-'''
+# find minimum
+distance = []
+radius = []
+keypoint_i = 0
 for keypoint in keypoint_list:
-    print("Keypoint:", keypoint.response)
-'''
+    # print("Keypoint:", keypoint.response)
+    distance.append([])
+    if keypoint_i == 0:
+        distance[0].append(1)
+    for index in range(keypoint_i):
+        distance[keypoint_i].append(np.linalg.norm(np.array(keypoint.pt) - np.array(keypoint_list[index].pt)))
+    radius.append(min(distance[keypoint_i]))
+    # print(keypoint_i, " radius:", radius[keypoint_i])
+    keypoint_i = keypoint_i + 1
 
+# sort by suppression radius
+keypoint_list = np.c_[keypoint_list, radius]
+keypoint_list = sorted(keypoint_list, key=lambda x:x[1], reverse=True)
+
+# get top n = 50
+keypoint_list = keypoint_list[0:50]
+keypoint_list = np.delete(keypoint_list, 1, axis=1).transpose()[0]
+
+img2_l = cv2.drawKeypoints(gray_l, keypoint_list, None, color=(0,255,0), flags=0)
+plt.imshow(img2_l), plt.show()
+#print(keypoint_list)
+#print(kp_l)
