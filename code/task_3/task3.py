@@ -38,3 +38,11 @@ dst = cv2.remap(img_l, mapx, mapy, cv2.INTER_LINEAR)
 x, y, w, h = roi
 dst = dst[y:y + h, x:x + w]
 cv2.imwrite(r'../../output/task_3/r_distort.png', dst)
+
+
+#ORB
+orb = cv2.ORB()
+kp_l = orb.detect(gray_l, None)
+kp_l, des_l = orb.compute(gray_l, kp_l)
+img2_l = cv.drawKeypoints(gray_l, kp_l, None, color=(0,255,0), flags=0)
+plt.imshow(img2_l), plt.show()
