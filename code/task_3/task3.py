@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+import operator
 
 
 img_l = cv2.imread('../../images/task_3_and_4/left_0.png')
@@ -41,8 +43,23 @@ cv2.imwrite(r'../../output/task_3/r_distort.png', dst)
 
 
 #ORB
-orb = cv2.ORB()
+orb = cv2.ORB_create()
 kp_l = orb.detect(gray_l, None)
 kp_l, des_l = orb.compute(gray_l, kp_l)
-img2_l = cv.drawKeypoints(gray_l, kp_l, None, color=(0,255,0), flags=0)
-plt.imshow(img2_l), plt.show()
+img2_l = cv2.drawKeypoints(gray_l, kp_l, None, color=(0,255,0), flags=0)
+#plt.imshow(img2_l), plt.show()
+
+keypoint_list = []
+keypoint_sorted = []
+for i, keypoint in enumerate(kp_l):
+    #print("Keypoint:", i, keypoint)
+    keypoint_list.append(keypoint)
+
+cmpfun = operator.attrgetter('response')
+keypoint_list.sort(key=cmpfun, reverse=True)
+
+'''
+for keypoint in keypoint_list:
+    print("Keypoint:", keypoint.response)
+'''
+
