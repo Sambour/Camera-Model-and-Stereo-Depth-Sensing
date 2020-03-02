@@ -24,9 +24,17 @@ distMatrix_r = fs_r.getNode("distort_coefficients")
 # Undistort left image
 h, w = img_l.shape[:2]
 newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix_l.mat(), distMatrix_l.mat(), (w, h), 1, (w, h))
-print(roi)
 mapx, mapy = cv2.initUndistortRectifyMap(cameraMatrix_l.mat(), distMatrix_l.mat(), None, newcameramtx, (w, h), 5)
 dst = cv2.remap(img_l, mapx, mapy, cv2.INTER_LINEAR)
 x, y, w, h = roi
 dst = dst[y:y + h, x:x + w]
 cv2.imwrite(r'../../output/task_3/l_distort.png', dst)
+
+# Undistort right image
+h, w = img_r.shape[:2]
+newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix_r.mat(), distMatrix_r.mat(), (w, h), 1, (w, h))
+mapx, mapy = cv2.initUndistortRectifyMap(cameraMatrix_r.mat(), distMatrix_r.mat(), None, newcameramtx, (w, h), 5)
+dst = cv2.remap(img_l, mapx, mapy, cv2.INTER_LINEAR)
+x, y, w, h = roi
+dst = dst[y:y + h, x:x + w]
+cv2.imwrite(r'../../output/task_3/r_distort.png', dst)
