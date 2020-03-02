@@ -70,7 +70,7 @@ for lr in [0, 1]:
     fs.write('camera_intrinsic', mtx)
     fs.write('distort_coefficients', dist)
 
-    for fname in images[0]:
+    for fname in images[lr]:
         img = cv2.imread(fname)
         h, w = img.shape[:2]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
