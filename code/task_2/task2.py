@@ -72,16 +72,25 @@ points4D = cv2.triangulatePoints(projMatrix_l, projMatrix_r, undist_l, undist_r)
 R1, R2, P1, P2, Q, validPixROI1, validPixROI2 = cv2.stereoRectify(cm1, dc1, cm2, dc2, (w, h), R, T)
 
 # Check the rectification results
-newcm_l, roi = cv2.getOptimalNewCameraMatrix(cm1, dc1, (w, h), 1, (w, h))
-mapx_l, mapy_l = cv2.initUndistortRectifyMap(cm1, dc1, R1, newcm_l, (w, h), 5)
+
+mapx_l, mapy_l = cv2.initUndistortRectifyMap(cm1, dc1, R1, P1, (w, h), 5)
 dst_l = cv2.remap(img_l, mapx_l, mapy_l, cv2.INTER_LINEAR)
-x, y, w, h = roi
-dst_l = dst_l[y:y + h, x:x + w]
 cv2.imwrite("img_l.png", dst_l)
 
-newcm_r, roi = cv2.getOptimalNewCameraMatrix(cm2, dc2, (w, h), 1, (w, h))
-mapx_r, mapy_r = cv2.initUndistortRectifyMap(cm2, dc2, R2, newcm_r, (w, h), 5)
+
+mapx_r, mapy_r = cv2.initUndistortRectifyMap(cm2, dc2, R2, P2, (w, h), 5)
 dst_r = cv2.remap(img_r, mapx_r, mapy_r, cv2.INTER_LINEAR)
-x, y, w, h = roi
-dst_r = dst_r[y:y + h, x:x + w]
 cv2.imwrite("img_r.png", dst_r)
+
+fs_sc = cv2.FileStorage("../../parameters/stereo_calibration.xml", cv2.FILE_STORAGE_WRITE)
+fs_sc.write('translation_vector', T)
+fs_sc.write('rotation_matrix', R)
+fs_sc.write('fundamental_matrix', F)
+fs_sc.write('essential_matrix', E)
+
+fs_sr = cv2.FileStorage("../../parameters/stereo_rectification.xml", cv2.FILE_STORAGE_WRITE)
+fs_sr.write('rectification_rotation_matrix_1', R1)
+fs_sr.write('rectification_rotation_matrix_2', R2)
+fs_sr.write('rectified_projection_matrix_1', P1)
+fs_sr.write('rectified_projection_matrix_2', P2)
+fs_sr.write('disparity_depth_matrix', Q)
