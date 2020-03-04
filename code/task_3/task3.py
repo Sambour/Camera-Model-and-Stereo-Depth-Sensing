@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import operator
 
 
@@ -23,8 +24,8 @@ cameraMatrix_r = fs_r.getNode("camera_intrinsic")
 distMatrix_r = fs_r.getNode("distort_coefficients")
 
 fs_projection = cv2.FileStorage("../../parameters/stereo_rectification.xml", cv2.FILE_STORAGE_READ)
-projMtx1 = fs_projection.getNode("rectification_rotation_matrix_1")
-projMtx2 = fs_projection.getNode("rectification_rotation_matrix_2")
+projMtx1 = fs_projection.getNode("rectified_projection_matrix_1")
+projMtx2 = fs_projection.getNode("rectified_projection_matrix_2")
 
 
 # Undistort left image
@@ -135,4 +136,20 @@ img4 = cv2.drawMatches(gray_l, keypoint_list_l, gray_r, keypoint_list_r, matches
 plt.imsave("../../output/task_3/matches.png", img4),plt.show()
 
 # step 4: Triangulate Points
+twoDPoint_l = []
+twoDPoint_r = []
+for keypoint in keypoint_list_l:
+    twoDPoint_l.append(keypoint.pt)
+for keypoint in keypoint_list_r:
+    twoDPoint_r.append(keypoint.pt)
+twoDPoint_l = np.array(twoDPoint_l)
+twoDPoint_r = np.array(twoDPoint_r)
+undist_l = cv2.undistortPoints(twoDPoint_l, cameraMatrix_l.mat(), distMatrix_l.mat())
+undist_r = cv2.undistortPoints(twoDPoint_r, cameraMatrix_r.mat(), distMatrix_r.mat())
 points4D = cv2.triangulatePoints(projMtx1.mat(), projMtx2.mat(), undist_l, undist_r)
+points4D = [c / points4D[3] for c in points4D]
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+Axes3D.scatter(ax, points4D[0], points4D[1], points4D[2])
+plt.show()
+# print(points4D)
