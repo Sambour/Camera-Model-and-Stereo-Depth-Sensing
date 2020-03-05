@@ -18,7 +18,7 @@ imgpoints_l = []  # 2d points in image plane for left camera
 imgpoints_r = []  # 2d points in image plane for right camera
 
 img_l = cv2.imread('../../images/task_2/left_0.png')
-img_r = cv2.imread('../../images/task_2/right_0.png')
+img_r = cv2.imread('../../images/task_2/left_1.png')
 
 h, w = img_l.shape[:2]
 
@@ -68,11 +68,41 @@ projMatrix_r = np.c_[R, T]
 
 # calculate 4D points
 points4D = cv2.triangulatePoints(projMatrix_l, projMatrix_r, undist_l, undist_r)
+points4D = [c / points4D[3] for c in points4D]
 # print(points4D)
+
+# show projection in 3D
+show_points_3D_l = [[0, 0, 0], [1, 1, 3], [1, -1, 3], [-1, -1, 3], [-1, 1, 3]]
+show_points_3D_r = []
+RTt = np.dot(np.transpose(R), T).transpose()
+# print("RTt: ", RTt)
+for point in show_points_3D_l:
+    point_r = np.dot(np.transpose(R), point) - RTt
+    show_points_3D_r.append(point_r)
+    # print("Point_r: ", point_r)
+
+square_l = show_points_3D_l
+square_l.append(show_points_3D_l[1])
+square_r = show_points_3D_r
+square_r.append(show_points_3D_r[1])
+square_l = np.transpose(square_l[1:6])
+square_r = np.transpose(square_r[1:6])
+
+line1_l = np.transpose([show_points_3D_l[1], show_points_3D_l[0], show_points_3D_l[2]])
+line2_l = np.transpose([show_points_3D_l[3], show_points_3D_l[0], show_points_3D_l[4]])
+line1_r = np.transpose([show_points_3D_r[1], show_points_3D_r[0], show_points_3D_r[2]])
+line2_r = np.transpose([show_points_3D_r[3], show_points_3D_r[0], show_points_3D_r[4]])
+
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-Axes3D.plot(ax, points4D[0], points4D[1], points4D[2])
-plt.show()
+Axes3D.scatter(ax, points4D[0], points4D[1], points4D[2])
+Axes3D.plot(ax, square_l[0].flatten(), square_l[1].flatten(), square_l[2].flatten(), 'C1')
+Axes3D.plot(ax, line1_l[0].flatten(), line1_l[1].flatten(), line1_l[2].flatten(), 'C1')
+Axes3D.plot(ax, line2_l[0].flatten(), line2_l[1].flatten(), line2_l[2].flatten(), 'C1')
+Axes3D.plot(ax, square_r[0].flatten(), square_r[1].flatten(), square_r[2].flatten(), 'C2')
+Axes3D.plot(ax, line1_r[0].flatten(), line1_r[1].flatten(), line1_r[2].flatten(), 'C2')
+Axes3D.plot(ax, line2_r[0].flatten(), line2_r[1].flatten(), line2_r[2].flatten(), 'C2')
+plt.savefig("../../output/task_2/Projection_before_rectify.png")
 
 # Rectify the stereo camera.
 R1, R2, P1, P2, Q, validPixROI1, validPixROI2 = cv2.stereoRectify(cm1, dc1, cm2, dc2, (w, h), R, T)
@@ -82,13 +112,52 @@ mapx_l, mapy_l = cv2.initUndistortRectifyMap(cm1, dc1, R1, P1, (w, h), 5)
 dst_l = cv2.remap(img_l, mapx_l, mapy_l, cv2.INTER_LINEAR)
 x, y, w, h = validPixROI1
 dst_l = dst_l[y:y + h, x:x + w]
-cv2.imwrite("img_l.png", dst_l)
+cv2.imwrite("../../output/task_2/img_l.png", dst_l)
 
 mapx_r, mapy_r = cv2.initUndistortRectifyMap(cm2, dc2, R2, P2, (w, h), 5)
 dst_r = cv2.remap(img_r, mapx_r, mapy_r, cv2.INTER_LINEAR)
 x, y, w, h = validPixROI2
 dst_r = dst_r[y:y + h, x:x + w]
-cv2.imwrite("img_r.png", dst_r)
+cv2.imwrite("../../output/task_2/img_r.png", dst_r)
+
+# show 3D after rectify
+# show projection in 3D
+show_original = [[0, 0, 0], [1, 1, 3], [1, -1, 3], [-1, -1, 3], [-1, 1, 3]]
+show_points_3D_l = []
+show_points_3D_r = []
+# print("RTt: ", RTt)
+for point in show_original:
+    point_l = np.dot(np.transpose(R1), point)
+    show_points_3D_l.append(point_l)
+
+RTt = np.dot(np.transpose(R2), T).transpose()
+for point in show_original:
+    point_r = np.dot(np.transpose(R2), point) - RTt
+    show_points_3D_r.append(point_r)
+    # print("Point_r: ", point_r)
+
+square_l = show_points_3D_l
+square_l.append(show_points_3D_l[1])
+square_r = show_points_3D_r
+square_r.append(show_points_3D_r[1])
+square_l = np.transpose(square_l[1:6])
+square_r = np.transpose(square_r[1:6])
+
+line1_l = np.transpose([show_points_3D_l[1], show_points_3D_l[0], show_points_3D_l[2]])
+line2_l = np.transpose([show_points_3D_l[3], show_points_3D_l[0], show_points_3D_l[4]])
+line1_r = np.transpose([show_points_3D_r[1], show_points_3D_r[0], show_points_3D_r[2]])
+line2_r = np.transpose([show_points_3D_r[3], show_points_3D_r[0], show_points_3D_r[4]])
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+Axes3D.scatter(ax, points4D[0], points4D[1], points4D[2])
+Axes3D.plot(ax, square_l[0].flatten(), square_l[1].flatten(), square_l[2].flatten(), 'C1')
+Axes3D.plot(ax, line1_l[0].flatten(), line1_l[1].flatten(), line1_l[2].flatten(), 'C1')
+Axes3D.plot(ax, line2_l[0].flatten(), line2_l[1].flatten(), line2_l[2].flatten(), 'C1')
+Axes3D.plot(ax, square_r[0].flatten(), square_r[1].flatten(), square_r[2].flatten(), 'C2')
+Axes3D.plot(ax, line1_r[0].flatten(), line1_r[1].flatten(), line1_r[2].flatten(), 'C2')
+Axes3D.plot(ax, line2_r[0].flatten(), line2_r[1].flatten(), line2_r[2].flatten(), 'C2')
+plt.savefig("../../output/task_2/Projection_after_rectify.png")
 
 # write the parameters
 fs_sc = cv2.FileStorage("../../parameters/stereo_calibration.xml", cv2.FILE_STORAGE_WRITE)

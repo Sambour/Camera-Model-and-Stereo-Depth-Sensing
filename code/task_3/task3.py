@@ -113,10 +113,10 @@ keypoint_list_r = np.c_[keypoint_list_r, radius_r]
 keypoint_list_r = sorted(keypoint_list_r, key=lambda x:x[1], reverse=True)
 
 # get top n = 10
-keypoint_list_l = keypoint_list_l[0:10]
+keypoint_list_l = keypoint_list_l[0:20]
 keypoint_list_l = np.delete(keypoint_list_l, 1, axis=1).transpose()[0]
 
-keypoint_list_r = keypoint_list_r[0:10]
+keypoint_list_r = keypoint_list_r[0:20]
 keypoint_list_r = np.delete(keypoint_list_r, 1, axis=1).transpose()[0]
 
 img3_l = cv2.drawKeypoints(gray_l, keypoint_list_l, None, color=(0,255,0), flags=0)
