@@ -27,7 +27,7 @@ disparityMatrix = fs.getNode("disparity_depth_matrix")
 # Undistort left image
 h, w = img_l.shape[:2]
 # newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix_l.mat(), distMatrix_l.mat(), (w, h), 1, (w, h))
-left_maps = cv2.initUndistortRectifyMap(cameraMatrix_l.mat(), distMatrix_l.mat(), rotationMatrix_l.mat(), projectMatrix_l.mat(), 'dims', 5)
+mapx_l, mapy_l = cv2.initUndistortRectifyMap(cameraMatrix_l.mat(), distMatrix_l.mat(), rotationMatrix_l.mat(), projectMatrix_l.mat(), (w, h), 5)
 dst_l = cv2.remap(img_l, mapx, mapy, cv2.INTER_LINEAR)
 x, y, w, h = roi
 dst_l = dst_l[y:y + h, x:x + w]
@@ -36,7 +36,7 @@ gray_l = cv2.cvtColor(dst_l, cv2.COLOR_BGR2GRAY)
 # Undistort right image
 h, w = img_r.shape[:2]
 # newcameramtx, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix_r.mat(), distMatrix_r.mat(), (w, h), 1, (w, h))
-mapx, mapy = cv2.initUndistortRectifyMap(cameraMatrix_r.mat(), distMatrix_r.mat(), rotationMatrix_r.mat(), projectMatrix_r.mat(), 'dims', 5)
+mapx, mapy = cv2.initUndistortRectifyMap(cameraMatrix_r.mat(), distMatrix_r.mat(), rotationMatrix_r.mat(), projectMatrix_r.mat(), (w, h), 5)
 dst_r = cv2.remap(img_r, mapx, mapy, cv2.INTER_LINEAR)
 x, y, w, h = roi
 dst_r = dst_r[y:y + h, x:x + w]
