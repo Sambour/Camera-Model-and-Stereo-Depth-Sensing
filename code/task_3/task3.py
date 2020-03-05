@@ -151,5 +151,5 @@ points4D = [c / points4D[3] for c in points4D]
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 Axes3D.scatter(ax, points4D[0], points4D[1], points4D[2])
-plt.show()
+plt.savefig("../../output/task_3/3D_features.png")
 # print(points4D)
